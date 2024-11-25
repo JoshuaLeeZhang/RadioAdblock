@@ -18,19 +18,33 @@ namespace ModernRadioPlayer.MVVM.Model
 
         private RadioStreamInfo radioStreamInfo;
 
-        public RadioItem(string backgroundColor, ICommand clickCommand, string name, bool hardCode = false, string iconUrl = "", string streamUrl = "", string displayName = "")
+        private RadioItem(string backgroundColor, ICommand clickCommand)
         {
             BackgroundColor = backgroundColor;
-
-            radioStreamInfo = new RadioStreamInfo(name, hardCode, iconUrl, streamUrl, displayName);
-
-            Favicon = radioStreamInfo.Favicon;
-            Name = radioStreamInfo.Name;
-            StreamURL = radioStreamInfo.StreamUrl;
-
             ClickCommand = clickCommand;
         }
 
-        
+        public static async Task<RadioItem> CreateAsync(
+            string backgroundColor,
+            ICommand clickCommand,
+            string name,
+            bool hardCode = false,
+            string iconUrl = "",
+            string streamUrl = "",
+            string displayName = "")
+        {
+            var radioItem = new RadioItem(backgroundColor, clickCommand);
+
+            // Initialize RadioStreamInfo asynchronously
+            var radioStreamInfo = await RadioStreamInfo.CreateAsync(name, hardCode, iconUrl, streamUrl, displayName);
+
+            // Assign the initialized properties
+            radioItem.Favicon = radioStreamInfo.Favicon;
+            radioItem.Name = radioStreamInfo.Name;
+            radioItem.StreamURL = radioStreamInfo.StreamUrl;
+
+            return radioItem;
+        }
+
     }
 }

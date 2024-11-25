@@ -19,37 +19,56 @@ namespace ModernRadioPlayer.MVVM.ViewModel
 {
     class HomeViewModel : INotifyPropertyChanged
     {
-        private readonly RadioBrowserClient radioBrowserClient;
-
-        public RadioStreamInfo radio1 { get; set; } 
-        public RadioStreamInfo radio2 { get; set; }
-        public RadioStreamInfo radio3 { get; set; }
-        public RadioStreamInfo radio4 { get; set; }
-
         public ObservableCollection<RadioItem> RadioItems { get; set; }
 
         public HomeViewModel()
         {
-            RadioItems = new ObservableCollection<RadioItem>
-            {
-                new (backgroundColor: "#FF7936D7",
-                     clickCommand: new RelayCommand(param => HandleClick(1)),
-                     name: "CHUM 104.5",
-                     hardCode: true,
-                     iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJCfS92qzLYTcrhbBY2gREiKUo0mTJPPC-QQ&s",
-                     streamUrl: "http://provisioning.streamtheworld.com/pls/CHUMFM.pls"),
-                new (backgroundColor: "#FF8359E1",
-                     clickCommand: new RelayCommand(param => HandleClick(2)),
-                     name: "CKIS \"KISS 92.5\" Toronto, ON",
-                     displayName: "KISS 92.5")
-            };
-
+            RadioItems = new ObservableCollection<RadioItem>();
+            
+            _ = LoadRadioItemsAsync();
         }
 
-        private void HandleClick(int id)
+        private async Task LoadRadioItemsAsync()
         {
-            // Replace this with your desired logic
-            System.Windows.MessageBox.Show($"Radio {id} clicked!");
+            var radioItem1 = await RadioItem.CreateAsync(
+                backgroundColor: "#FF7936D7",
+                clickCommand: null, // Set to null initially
+                name: "CHUM 104.5",
+                hardCode: true,
+                iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJCfS92qzLYTcrhbBY2gREiKUo0mTJPPC-QQ&s",
+                streamUrl: "http://provisioning.streamtheworld.com/pls/CHUMFM.pls");
+
+            // Set the ClickCommand after the RadioItem is created
+            radioItem1.ClickCommand = new RelayCommand(param => HandleClick(radioItem1));
+            RadioItems.Add(radioItem1);
+
+            var radioItem2 = await RadioItem.CreateAsync(
+                backgroundColor: "#FF8359E1",
+                clickCommand: null, // Set to null initially
+                name: "CKIS \"KISS 92.5\" Toronto, ON",
+                displayName: "KISS 92.5");
+
+            // Set the ClickCommand after the RadioItem is created
+            radioItem2.ClickCommand = new RelayCommand(param => HandleClick(radioItem2));
+            RadioItems.Add(radioItem2);
+        }
+
+        private void HandleClick(RadioItem radioItem)
+        {
+            if (radioItem != null && !string.IsNullOrEmpty(radioItem.StreamURL))
+            {
+                PlayStream(radioItem.StreamURL);
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Invalid radio item or stream URL.");
+            }
+        }
+
+        private void PlayStream(string streamURL)
+        {
+            // Logic to play the stream
+            System.Windows.MessageBox.Show($"Playing stream from URL: {streamURL}");
         }
 
 

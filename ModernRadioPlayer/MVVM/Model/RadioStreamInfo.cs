@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using RadioBrowser;
 using System.Windows.Media.Imaging;
 using System.Windows;
 
@@ -80,27 +79,29 @@ namespace ModernRadioPlayer.MVVM.Model
             }
         }
 
-
-
-
-        public RadioStreamInfo(string name, bool hardCode = false, string iconUrl = "", string streamUrl = "", string displayName = "")
+        private RadioStreamInfo() // Make the constructor private to enforce async creation.
         {
             radioBrowserClient = new RadioBrowserClient();
+        }
+
+        public static async Task<RadioStreamInfo> CreateAsync(string name, bool hardCode = false, string iconUrl = "", string streamUrl = "", string displayName = "")
+        {
+            var instance = new RadioStreamInfo();
 
             if (hardCode)
             {
-                Name = name;
-                IconUrl = iconUrl;
-                StreamUrl = streamUrl;
+                instance.Name = name;
+                instance.IconUrl = iconUrl;
+                instance.StreamUrl = streamUrl;
+                instance.LoadFavicon(iconUrl);
             }
             else
             {
-
-                LoadRadioDataAsync(name).ConfigureAwait(false);
-
-                Name = displayName;
+                await instance.LoadRadioDataAsync(name);
+                instance.Name = string.IsNullOrEmpty(instance.Name) ? displayName : instance.Name;
             }
 
+            return instance;
         }
 
         private async Task LoadRadioDataAsync(string radioName)
@@ -113,13 +114,14 @@ namespace ModernRadioPlayer.MVVM.Model
                 if (radioStation != null)
                 {
                     Name = radioStation.Name ?? "Unknown Station";
-                    IconUrl = radioStation.Favicon.AbsoluteUri ?? "C:\\Users\\joshz\\repos\\ModernRadioPlayer\\ModernRadioPlayer\\Images\\QuestionMark.png"; // Default icon URL
+                    IconUrl = radioStation.Favicon.AbsoluteUri ?? "C:\\Users\\joshz\\repos\\ModernRadioPlayer\\ModernRadioPlayer\\Images\\QuestionMark.png";
                     StreamUrl = radioStation.Url.ToString() ?? string.Empty;
+                    LoadFavicon(IconUrl); // Load the favicon once the URL is set.
                 }
                 else
                 {
                     Name = "Station Not Found";
-                    IconUrl = "C:\\Users\\joshz\\repos\\ModernRadioPlayer\\ModernRadioPlayer\\Images\\QuestionMark.png"; // Default fallback icon
+                    IconUrl = "C:\\Users\\joshz\\repos\\ModernRadioPlayer\\ModernRadioPlayer\\Images\\QuestionMark.png";
                     StreamUrl = string.Empty;
                 }
             }
