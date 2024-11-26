@@ -12,8 +12,6 @@ namespace ModernRadioPlayer.MVVM.ViewModel
 
         public RelayCommand HomeViewCommand { get; set; }
 
-        public RelayCommand DiscoveryViewCommand { get; set; }
-
         public AudioPlayerViewModel AudioPlayerVM { get; set; }
 
         public HomeViewModel HomeVM { get; set; }

@@ -53,11 +53,16 @@ namespace ModernRadioPlayer.MVVM.ViewModel
             RadioItems.Add(radioItem2);
         }
 
-        private void HandleClick(RadioItem radioItem)
+        private void HandleClick(RadioItem selectedRadioItem)
         {
-            if (radioItem != null && !string.IsNullOrEmpty(radioItem.StreamURL))
+            if (selectedRadioItem != null && !string.IsNullOrEmpty(selectedRadioItem.StreamURL))
             {
-                PlayStream(radioItem);
+                foreach(var radioItem in RadioItems)
+                {
+                    StopStream(radioItem);
+                }
+
+                PlayStream(selectedRadioItem);
             }
             else
             {
@@ -68,6 +73,11 @@ namespace ModernRadioPlayer.MVVM.ViewModel
         private void PlayStream(RadioItem radioItem)
         {
             radioItem.PlayStream();
+        }
+
+        private void StopStream(RadioItem radioItem)
+        {
+            radioItem.StopStream();
         }
 
 
