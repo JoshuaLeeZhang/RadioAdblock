@@ -57,18 +57,17 @@ namespace ModernRadioPlayer.MVVM.ViewModel
         {
             if (radioItem != null && !string.IsNullOrEmpty(radioItem.StreamURL))
             {
-                PlayStream(radioItem.StreamURL);
+                PlayStream(radioItem);
             }
             else
             {
-                System.Windows.MessageBox.Show("Invalid radio item or stream URL.");
+                MessageBox.Show("Invalid radio item or stream URL.");
             }
         }
 
-        private void PlayStream(string streamURL)
+        private void PlayStream(RadioItem radioItem)
         {
-            // Logic to play the stream
-            System.Windows.MessageBox.Show($"Playing stream from URL: {streamURL}");
+            radioItem.PlayStream();
         }
 
 

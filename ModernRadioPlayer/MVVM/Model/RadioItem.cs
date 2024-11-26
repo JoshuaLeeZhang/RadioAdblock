@@ -17,6 +17,7 @@ namespace ModernRadioPlayer.MVVM.Model
         public ICommand ClickCommand { get; set; }
 
         private RadioStreamInfo radioStreamInfo;
+        private RadioPlaybackService radioPlaybackService;
 
         private RadioItem(string backgroundColor, ICommand clickCommand)
         {
@@ -43,7 +44,21 @@ namespace ModernRadioPlayer.MVVM.Model
             radioItem.Name = radioStreamInfo.Name;
             radioItem.StreamURL = radioStreamInfo.StreamUrl;
 
+            System.Diagnostics.Debug.WriteLine($"RadioItem has StreamURL: {radioItem.StreamURL}");
+
+            radioItem.radioPlaybackService = new RadioPlaybackService(radioItem.StreamURL);
+
             return radioItem;
+        }
+
+        public void PlayStream()
+        {
+            radioPlaybackService.PlayStream();
+        }
+
+        public void StopStream()
+        {
+            radioPlaybackService.StopStream();
         }
 
     }

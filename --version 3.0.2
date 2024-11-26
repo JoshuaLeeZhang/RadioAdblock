@@ -1,0 +1,199 @@
+[1mdiff --git a/ModernRadioPlayer/MVVM/Model/RadioItem.cs b/ModernRadioPlayer/MVVM/Model/RadioItem.cs[m
+[1mindex d88f646..cf2162d 100644[m
+[1m--- a/ModernRadioPlayer/MVVM/Model/RadioItem.cs[m
+[1m+++ b/ModernRadioPlayer/MVVM/Model/RadioItem.cs[m
+[36m@@ -18,19 +18,33 @@[m [mnamespace ModernRadioPlayer.MVVM.Model[m
+ [m
+         private RadioStreamInfo radioStreamInfo;[m
+ [m
+[31m-        public RadioItem(string backgroundColor, ICommand clickCommand, string name, bool hardCode = false, string iconUrl = "", string streamUrl = "", string displayName = "")[m
+[32m+[m[32m        private RadioItem(string backgroundColor, ICommand clickCommand)[m
+         {[m
+             BackgroundColor = backgroundColor;[m
+[32m+[m[32m            ClickCommand = clickCommand;[m
+[32m+[m[32m        }[m
+ [m
+[31m-            radioStreamInfo = new RadioStreamInfo(name, hardCode, iconUrl, streamUrl, displayName);[m
+[32m+[m[32m        public static async Task<RadioItem> CreateAsync([m
+[32m+[m[32m            string backgroundColor,[m
+[32m+[m[32m            ICommand clickCommand,[m
+[32m+[m[32m            string name,[m
+[32m+[m[32m            bool hardCode = false,[m
+[32m+[m[32m            string iconUrl = "",[m
+[32m+[m[32m            string streamUrl = "",[m
+[32m+[m[32m            string displayName = "")[m
+[32m+[m[32m        {[m
+[32m+[m[32m            var radioItem = new RadioItem(backgroundColor, clickCommand);[m
+ [m
+[31m-            Favicon = radioStreamInfo.Favicon;[m
+[31m-            Name = radioStreamInfo.Name;[m
+[31m-            StreamURL = radioStreamInfo.StreamUrl;[m
+[32m+[m[32m            // Initialize RadioStreamInfo asynchronously[m
+[32m+[m[32m            var radioStreamInfo = await RadioStreamInfo.CreateAsync(name, hardCode, iconUrl, streamUrl, displayName);[m
+ [m
+[31m-            ClickCommand = clickCommand;[m
+[32m+[m[32m            // Assign the initialized properties[m
+[32m+[m[32m            radioItem.Favicon = radioStreamInfo.Favicon;[m
+[32m+[m[32m            radioItem.Name = radioStreamInfo.Name;[m
+[32m+[m[32m            radioItem.StreamURL = radioStreamInfo.StreamUrl;[m
+[32m+[m
+[32m+[m[32m            return radioItem;[m
+         }[m
+ [m
+[31m-        [m
+     }[m
+ }[m
+[1mdiff --git a/ModernRadioPlayer/MVVM/Model/RadioStreamInfo.cs b/ModernRadioPlayer/MVVM/Model/RadioStreamInfo.cs[m
+[1mindex f75b352..a6dc93f 100644[m
+[1m--- a/ModernRadioPlayer/MVVM/Model/RadioStreamInfo.cs[m
+[1m+++ b/ModernRadioPlayer/MVVM/Model/RadioStreamInfo.cs[m
+[36m@@ -6,7 +6,6 @@[m [musing System.Linq;[m
+ using System.Text;[m
+ using System.Threading.Tasks;[m
+ using System.Windows.Media;[m
+[31m-using RadioBrowser;[m
+ using System.Windows.Media.Imaging;[m
+ using System.Windows;[m
+ [m
+[36m@@ -80,27 +79,29 @@[m [mnamespace ModernRadioPlayer.MVVM.Model[m
+             }[m
+         }[m
+ [m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-        public RadioStreamInfo(string name, bool hardCode = false, string iconUrl = "", string streamUrl = "", string displayName = "")[m
+[32m+[m[32m        private RadioStreamInfo() // Make the constructor private to enforce async creation.[m
+         {[m
+             radioBrowserClient = new RadioBrowserClient();[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        public static async Task<RadioStreamInfo> CreateAsync(string name, bool hardCode = false, string iconUrl = "", string streamUrl = "", string displayName = "")[m
+[32m+[m[32m        {[m
+[32m+[m[32m            var instance = new RadioStreamInfo();[m
+ [m
+             if (hardCode)[m
+             {[m
+[31m-                Name = name;[m
+[31m-                IconUrl = iconUrl;[m
+[31m-                StreamUrl = streamUrl;[m
+[32m+[m[32m                instance.Name = name;[m
+[32m+[m[32m                instance.IconUrl = iconUrl;[m
+[32m+[m[32m                instance.StreamUrl = streamUrl;[m
+[32m+[m[32m                instance.LoadFavicon(iconUrl);[m
+             }[m
+             else[m
+             {[m
+[31m-[m
+[31m-                LoadRadioDataAsync(name).ConfigureAwait(false);[m
+[31m-[m
+[31m-                Name = displayName;[m
+[32m+[m[32m                await instance.LoadRadioDataAsync(name);[m
+[32m+[m[32m                instance.Name = string.IsNullOrEmpty(instance.Name) ? displayName : instance.Name;[m
+             }[m
+ [m
+[32m+[m[32m            return instance;[m
+         }[m
+ [m
+         private async Task LoadRadioDataAsync(string radioName)[m
+[36m@@ -113,13 +114,14 @@[m [mnamespace ModernRadioPlayer.MVVM.Model[m
+                 if (radioStation != null)[m
+                 {[m
+                     Name = radioStation.Name ?? "Unknown Station";[m
+[31m-                    IconUrl = radioStation.Favicon.AbsoluteUri ?? "C:\\Users\\joshz\\repos\\ModernRadioPlayer\\ModernRadioPlayer\\Images\\QuestionMark.png"; // Default icon URL[m
+[32m+[m[32m                    IconUrl = radioStation.Favicon.AbsoluteUri ?? "C:\\Users\\joshz\\repos\\ModernRadioPlayer\\ModernRadioPlayer\\Images\\QuestionMark.png";[m
+                     StreamUrl = radioStation.Url.ToString() ?? string.Empty;[m
+[32m+[m[32m                    LoadFavicon(IconUrl); // Load the favicon once the URL is set.[m
+                 }[m
+                 else[m
+                 {[m
+                     Name = "Station Not Found";[m
+[31m-                    IconUrl = "C:\\Users\\joshz\\repos\\ModernRadioPlayer\\ModernRadioPlayer\\Images\\QuestionMark.png"; // Default fallback icon[m
+[32m+[m[32m                    IconUrl = "C:\\Users\\joshz\\repos\\ModernRadioPlayer\\ModernRadioPlayer\\Images\\QuestionMark.png";[m
+                     StreamUrl = string.Empty;[m
+                 }[m
+             }[m
+[1mdiff --git a/ModernRadioPlayer/MVVM/ViewModel/HomeViewModel.cs b/ModernRadioPlayer/MVVM/ViewModel/HomeViewModel.cs[m
+[1mindex 5200ce2..fd0a6ac 100644[m
+[1m--- a/ModernRadioPlayer/MVVM/ViewModel/HomeViewModel.cs[m
+[1m+++ b/ModernRadioPlayer/MVVM/ViewModel/HomeViewModel.cs[m
+[36m@@ -19,37 +19,56 @@[m [mnamespace ModernRadioPlayer.MVVM.ViewModel[m
+ {[m
+     class HomeViewModel : INotifyPropertyChanged[m
+     {[m
+[31m-        private readonly RadioBrowserClient radioBrowserClient;[m
+[31m-[m
+[31m-        public RadioStreamInfo radio1 { get; set; } [m
+[31m-        public RadioStreamInfo radio2 { get; set; }[m
+[31m-        public RadioStreamInfo radio3 { get; set; }[m
+[31m-        public RadioStreamInfo radio4 { get; set; }[m
+[31m-[m
+         public ObservableCollection<RadioItem> RadioItems { get; set; }[m
+ [m
+         public HomeViewModel()[m
+         {[m
+[31m-            RadioItems = new ObservableCollection<RadioItem>[m
+[31m-            {[m
+[31m-                new (backgroundColor: "#FF7936D7",[m
+[31m-                     clickCommand: new RelayCommand(param => HandleClick(1)),[m
+[31m-                     name: "CHUM 104.5",[m
+[31m-                     hardCode: true,[m
+[31m-                     iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJCfS92qzLYTcrhbBY2gREiKUo0mTJPPC-QQ&s",[m
+[31m-                     streamUrl: "http://provisioning.streamtheworld.com/pls/CHUMFM.pls"),[m
+[31m-                new (backgroundColor: "#FF8359E1",[m
+[31m-                     clickCommand: new RelayCommand(param => HandleClick(2)),[m
+[31m-                     name: "CKIS \"KISS 92.5\" Toronto, ON",[m
+[31m-                     displayName: "KISS 92.5")[m
+[31m-            };[m
+[32m+[m[32m            RadioItems = new ObservableCollection<RadioItem>();[m
+[32m+[m[41m            [m
+[32m+[m[32m            _ = LoadRadioItemsAsync();[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        private async Task LoadRadioItemsAsync()[m
+[32m+[m[32m        {[m
+[32m+[m[32m            var radioItem1 = await RadioItem.CreateAsync([m
+[32m+[m[32m                backgroundColor: "#FF7936D7",[m
+[32m+[m[32m                clickCommand: null, // Set to null initially[m
+[32m+[m[32m                name: "CHUM 104.5",[m
+[32m+[m[32m                hardCode: true,[m
+[32m+[m[32m                iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJCfS92qzLYTcrhbBY2gREiKUo0mTJPPC-QQ&s",[m
+[32m+[m[32m                streamUrl: "http://provisioning.streamtheworld.com/pls/CHUMFM.pls");[m
+[32m+[m
+[32m+[m[32m            // Set the ClickCommand after the RadioItem is created[m
+[32m+[m[32m            radioItem1.ClickCommand = new RelayCommand(param => HandleClick(radioItem1));[m
+[32m+[m[32m            RadioItems.Add(radioItem1);[m
+ [m
+[32m+[m[32m            var radioItem2 = await RadioItem.CreateAsync([m
+[32m+[m[32m                backgroundColor: "#FF8359E1",[m
+[32m+[m[32m                clickCommand: null, // Set to null initially[m
+[32m+[m[32m                name: "CKIS \"KISS 92.5\" Toronto, ON",[m
+[32m+[m[32m                displayName: "KISS 92.5");[m
+[32m+[m
+[32m+[m[32m            // Set the ClickCommand after the RadioItem is created[m
+[32m+[m[32m            radioItem2.ClickCommand = new RelayCommand(param => HandleClick(radioItem2));[m
+[32m+[m[32m            RadioItems.Add(radioItem2);[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        private void HandleClick(RadioItem radioItem)[m
+[32m+[m[32m        {[m
+[32m+[m[32m            if (radioItem != null && !string.IsNullOrEmpty(radioItem.StreamURL))[m
+[32m+[m[32m            {[m
+[32m+[m[32m                PlayStream(radioItem.StreamURL);[m
+[32m+[m[32m            }[m
+[32m+[m[32m            else[m
+[32m+[m[32m            {[m
+[32m+[m[32m                System.Windows.MessageBox.Show("Invalid radio item or stream URL.");[m
+[32m+[m[32m            }[m
+         }[m
+ [m
+[31m-        private void HandleClick(int id)[m
+[32m+[m[32m        private void PlayStream(string streamURL)[m
+         {[m
+[31m-            // Replace this with your desired logic[m
+[31m-            System.Windows.MessageBox.Show($"Radio {id} clicked!");[m
+[32m+[m[32m            // Logic to play the stream[m
+[32m+[m[32m            System.Windows.MessageBox.Show($"Playing stream from URL: {streamURL}");[m
+         }[m
+ [m
+ [m
