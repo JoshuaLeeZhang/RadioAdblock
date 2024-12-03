@@ -64,9 +64,9 @@ namespace ModernRadioPlayer.MVVM.Model
             }
         }
 
-        private ImageSource favicon;
+        private ImageSource? favicon;
 
-        public ImageSource Favicon
+        public ImageSource? Favicon
         {
             get { return favicon; }
             set
@@ -156,7 +156,7 @@ namespace ModernRadioPlayer.MVVM.Model
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)
         {

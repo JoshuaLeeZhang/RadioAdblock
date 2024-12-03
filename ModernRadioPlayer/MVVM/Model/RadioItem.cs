@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -10,14 +6,15 @@ namespace ModernRadioPlayer.MVVM.Model
 {
     internal class RadioItem
     {
-        public string BackgroundColor { get; set; }
-        public ImageSource Favicon { get; set; }
-        public string Name { get; set; }
-        public string StreamURL { get; set; }
+        public string? BackgroundColor { get; set; }
+        public ImageSource? Favicon { get; set; }
+        public string? Name { get; set; }
+        public string? StreamURL { get; set; }
         public ICommand ClickCommand { get; set; }
 
-        private RadioStreamInfo radioStreamInfo;
-        private RadioPlaybackService radioPlaybackService;
+        private RadioPlaybackService? radioPlaybackService;
+        private AudioRewindBuffer? audioRewindBuffer;
+        private AudioPlaybackService? audioPlaybackService;
 
         private RadioItem(string backgroundColor, ICommand clickCommand)
         {
@@ -44,21 +41,23 @@ namespace ModernRadioPlayer.MVVM.Model
             radioItem.Name = radioStreamInfo.Name;
             radioItem.StreamURL = radioStreamInfo.StreamUrl;
 
-            System.Diagnostics.Debug.WriteLine($"RadioItem has StreamURL: {radioItem.StreamURL}");
+            Console.WriteLine($"Create RadioItem with name: {radioItem.Name}");
 
-            radioItem.radioPlaybackService = new RadioPlaybackService(radioItem.StreamURL);
+            radioItem.audioRewindBuffer = new AudioRewindBuffer(22050, 1, 16, 60);
+            radioItem.radioPlaybackService = new RadioPlaybackService(radioItem.StreamURL, radioItem.audioRewindBuffer); // Writes to audioRewindBuffer
+            radioItem.audioPlaybackService = new AudioPlaybackService(22050, 1, 16, radioItem.audioRewindBuffer); // Reads from audioRewindBuffer
 
             return radioItem;
         }
 
         public void PlayStream()
         {
-            radioPlaybackService.PlayStream();
+            audioPlaybackService?.StartPlayback();
         }
 
         public void StopStream()
         {
-            radioPlaybackService.StopStream();
+            audioPlaybackService?.StopPlayback();
         }
 
     }

@@ -11,18 +11,12 @@ namespace ModernRadioPlayer.MVVM.ViewModel
 {
     class AudioPlayerViewModel : INotifyPropertyChanged
     {
-        private readonly RadioBrowserClient radioBrowserClient;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public AudioPlayerViewModel()
-        {
-            radioBrowserClient = new RadioBrowserClient();
         }
 
     }

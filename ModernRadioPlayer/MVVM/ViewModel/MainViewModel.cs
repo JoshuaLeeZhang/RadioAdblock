@@ -16,7 +16,7 @@ namespace ModernRadioPlayer.MVVM.ViewModel
 
         public HomeViewModel HomeVM { get; set; }
 
-        private object _currentView;
+        private object? _currentView;
 
         public object CurrentView
         {
@@ -28,7 +28,7 @@ namespace ModernRadioPlayer.MVVM.ViewModel
             }
         }
 
-        private object _audioView;
+        private object? _audioView;
 
         public object AudioView
         {

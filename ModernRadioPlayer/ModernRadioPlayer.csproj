@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="LibVLCSharp" Version="3.9.1" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="RadioBrowser" Version="0.7.0" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
   </ItemGroup>

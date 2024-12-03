@@ -13,7 +13,6 @@ namespace ModernRadioPlayer.MVVM.View
         public AudioPlayerView()
         {
             InitializeComponent();
-            DataContext = new AudioPlayerViewModel();
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)

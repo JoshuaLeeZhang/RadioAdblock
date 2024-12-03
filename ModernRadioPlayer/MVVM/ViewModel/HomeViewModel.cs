@@ -20,6 +20,7 @@ namespace ModernRadioPlayer.MVVM.ViewModel
     class HomeViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<RadioItem> RadioItems { get; set; }
+        private RadioItem? currentRadioItem;
 
         public HomeViewModel()
         {
@@ -36,7 +37,7 @@ namespace ModernRadioPlayer.MVVM.ViewModel
                 name: "CHUM 104.5",
                 hardCode: true,
                 iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJCfS92qzLYTcrhbBY2gREiKUo0mTJPPC-QQ&s",
-                streamUrl: "http://provisioning.streamtheworld.com/pls/CHUMFM.pls");
+                streamUrl: "https://14223.live.streamtheworld.com/CHUMFM.mp3");
 
             // Set the ClickCommand after the RadioItem is created
             radioItem1.ClickCommand = new RelayCommand(param => HandleClick(radioItem1));
@@ -55,18 +56,21 @@ namespace ModernRadioPlayer.MVVM.ViewModel
 
         private void HandleClick(RadioItem selectedRadioItem)
         {
-            if (selectedRadioItem != null && !string.IsNullOrEmpty(selectedRadioItem.StreamURL))
-            {
-                foreach(var radioItem in RadioItems)
-                {
-                    StopStream(radioItem);
-                }
-
-                PlayStream(selectedRadioItem);
-            }
-            else
+            if (selectedRadioItem == null || string.IsNullOrEmpty(selectedRadioItem.StreamURL))
             {
                 MessageBox.Show("Invalid radio item or stream URL.");
+                return;
+            }
+
+            if (currentRadioItem != null && currentRadioItem != selectedRadioItem)
+            {
+                StopStream(currentRadioItem);
+            }
+
+            if (currentRadioItem != selectedRadioItem)
+            {
+                PlayStream(selectedRadioItem);
+                currentRadioItem = selectedRadioItem;
             }
         }
 
@@ -81,7 +85,7 @@ namespace ModernRadioPlayer.MVVM.ViewModel
         }
 
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
