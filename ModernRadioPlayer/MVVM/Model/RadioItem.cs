@@ -45,6 +45,7 @@ namespace ModernRadioPlayer.MVVM.Model
 
             radioItem.audioRewindBuffer = new AudioRewindBuffer(22050, 1, 16, 60);
             radioItem.radioPlaybackService = new RadioPlaybackService(radioItem.StreamURL, radioItem.audioRewindBuffer); // Writes to audioRewindBuffer
+            // Create something here to clear ads from the stream
             radioItem.audioPlaybackService = new AudioPlaybackService(22050, 1, 16, radioItem.audioRewindBuffer); // Reads from audioRewindBuffer
 
             return radioItem;

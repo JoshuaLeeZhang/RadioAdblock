@@ -15,8 +15,11 @@
 
   <ItemGroup>
     <PackageReference Include="LibVLCSharp" Version="3.9.1" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.20.1" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="RadioBrowser" Version="0.7.0" />
+    <PackageReference Include="TorchAudio" Version="0.104.0" />
+    <PackageReference Include="TorchSharp" Version="0.104.0" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
   </ItemGroup>
 
