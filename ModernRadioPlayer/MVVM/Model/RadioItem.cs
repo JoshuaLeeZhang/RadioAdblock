@@ -15,7 +15,7 @@ namespace ModernRadioPlayer.MVVM.Model
         private RadioPlaybackService? radioPlaybackService;
         private AudioRewindBuffer? audioRewindBuffer;
         private AudioPlaybackService? audioPlaybackService;
-
+        private AdRemovalService? adRemovalService;
         private RadioItem(string backgroundColor, ICommand clickCommand)
         {
             BackgroundColor = backgroundColor;
@@ -45,7 +45,7 @@ namespace ModernRadioPlayer.MVVM.Model
 
             radioItem.audioRewindBuffer = new AudioRewindBuffer(22050, 1, 16, 60);
             radioItem.radioPlaybackService = new RadioPlaybackService(radioItem.StreamURL, radioItem.audioRewindBuffer); // Writes to audioRewindBuffer
-            // Create something here to clear ads from the stream
+            radioItem.adRemovalService = new AdRemovalService(radioItem.audioRewindBuffer); // Makes ads quieter
             radioItem.audioPlaybackService = new AudioPlaybackService(22050, 1, 16, radioItem.audioRewindBuffer); // Reads from audioRewindBuffer
 
             return radioItem;

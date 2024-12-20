@@ -1,19 +1,74 @@
-﻿using System;
+﻿using NAudio.Wave;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TorchSharp;
+using static TorchSharp.torch;
+using TorchSharp.Transforms;
+using static TorchSharp.torchaudio;
+using static TorchSharp.torchaudio.functional;
+using static TorchSharp.torchaudio.transforms;
 
 namespace ModernRadioPlayer.MVVM.Model
 {
     internal class AdRemovalService
     {
-        // This needs to be able to access AudioRewindBuffer
+        private MFCC? mfcc;
+        private CRNN? crnn;
+        private AudioRewindBuffer audioRewindBuffer;
 
-        // Create a method that converts the audio buffer to a MFCC feature vector
+        public AdRemovalService(AudioRewindBuffer audioRewindBuffer, int sampleRate = 22050)
+        {
+            this.audioRewindBuffer = audioRewindBuffer;
+            crnn = new CRNN(20);
+            crnn.load("C:\\Users\\joshz\\repos\\ModernRadioPlayer\\ModernRadioPlayer\\Models\\model_weights.dat");
+            crnn.eval();
 
-        // Make a prediction based on the feature vector
+            mfcc = new MFCC();
 
-        // If the prediction is that an ad is playing, make the audio more quite
+            Task.Run(() =>
+            {
+                Thread.Sleep(15000); // Sleep for 15 seconds
+
+                StartFilteringAds();
+            });
+        }
+
+        private void StartFilteringAds()
+        {
+            Task.Run(() => FilterAds());
+        }
+
+        private void FilterAds()
+        {
+
+            while (audioRewindBuffer.ReadyForPrediction())
+            {
+                if (mfcc == null) throw new Exception("MFCC is null and was not set up correctly");
+                if (crnn == null) throw new Exception("CRNN is null and was not set up correctly");
+
+                var (predictionBuffer, readFrom) = audioRewindBuffer.ReadFromBufferPrediction();
+
+                Console.WriteLine("Buffer length: " + predictionBuffer.Length + "    " + "readFrom: " + readFrom);
+
+                Tensor waveform = ByteArrayToTensor.Convert(predictionBuffer);
+
+                Tensor mfccTensor = mfcc.forward(waveform);
+
+                mfccTensor = mfccTensor.view(1, 1, mfccTensor.shape[0], mfccTensor.shape[1]);
+
+                var output = crnn.forward(mfccTensor);
+
+                bool is_music = true;
+
+                if (output.argmax(1).ToInt32() == 1) is_music = false;
+
+                if (!is_music) audioRewindBuffer.SetVolume(0.1f, readFrom);
+
+                Thread.Sleep(10000); // Sleep for 10 second
+            }
+        }
     }
 }

@@ -43,15 +43,15 @@ namespace ModernRadioPlayer.MVVM.ViewModel
             radioItem1.ClickCommand = new RelayCommand(param => HandleClick(radioItem1));
             RadioItems.Add(radioItem1);
 
-            var radioItem2 = await RadioItem.CreateAsync(
-                backgroundColor: "#FF8359E1",
-                clickCommand: null, // Set to null initially
-                name: "CKIS \"KISS 92.5\" Toronto, ON",
-                displayName: "KISS 92.5");
+            //var radioItem2 = await RadioItem.CreateAsync(
+            //    backgroundColor: "#FF8359E1",
+            //    clickCommand: null, // Set to null initially
+            //    name: "CKIS \"KISS 92.5\" Toronto, ON",
+            //    displayName: "KISS 92.5");
 
-            // Set the ClickCommand after the RadioItem is created
-            radioItem2.ClickCommand = new RelayCommand(param => HandleClick(radioItem2));
-            RadioItems.Add(radioItem2);
+            //// Set the ClickCommand after the RadioItem is created
+            //radioItem2.ClickCommand = new RelayCommand(param => HandleClick(radioItem2));
+            //RadioItems.Add(radioItem2);
         }
 
         private void HandleClick(RadioItem selectedRadioItem)
