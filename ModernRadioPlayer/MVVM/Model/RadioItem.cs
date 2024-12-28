@@ -16,6 +16,8 @@ namespace ModernRadioPlayer.MVVM.Model
         private AudioRewindBuffer? audioRewindBuffer;
         private AudioPlaybackService? audioPlaybackService;
         private AdRemovalService? adRemovalService;
+        public DateTime CreationTime { get; private set; }
+
         private RadioItem(string backgroundColor, ICommand clickCommand)
         {
             BackgroundColor = backgroundColor;
@@ -48,11 +50,19 @@ namespace ModernRadioPlayer.MVVM.Model
             radioItem.adRemovalService = new AdRemovalService(radioItem.audioRewindBuffer); // Makes ads quieter
             radioItem.audioPlaybackService = new AudioPlaybackService(22050, 1, 16, radioItem.audioRewindBuffer); // Reads from audioRewindBuffer
 
+            radioItem.CreationTime = DateTime.Now;
+
             return radioItem;
         }
 
         public void PlayStream()
         {
+            if ((DateTime.Now - CreationTime).TotalSeconds < 35)
+            {
+                Console.WriteLine("Cannot play stream. Please wait at least 35 seconds after creation.");
+                return;
+            }
+
             audioPlaybackService?.StartPlayback();
         }
 

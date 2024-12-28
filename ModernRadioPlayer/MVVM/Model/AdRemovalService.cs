@@ -1,15 +1,5 @@
-﻿using NAudio.Wave;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TorchSharp;
+﻿using TorchSharp;
 using static TorchSharp.torch;
-using TorchSharp.Transforms;
-using static TorchSharp.torchaudio;
-using static TorchSharp.torchaudio.functional;
-using static TorchSharp.torchaudio.transforms;
 
 namespace ModernRadioPlayer.MVVM.Model
 {
@@ -30,15 +20,10 @@ namespace ModernRadioPlayer.MVVM.Model
 
             Task.Run(() =>
             {
-                Thread.Sleep(15000); // Sleep for 15 seconds
+                Thread.Sleep(30000); // Sleep for 30 seconds
 
-                StartFilteringAds();
+                FilterAds();
             });
-        }
-
-        private void StartFilteringAds()
-        {
-            Task.Run(() => FilterAds());
         }
 
         private void FilterAds()
